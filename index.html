@@ -1,0 +1,71 @@
+const attempted = doneMcq + doneTf;
+  const pct = attempted ? Math.round(correct/total*100) : 0;
+  const res = document.getElementById('quizResult');
+  res.classList.add('show');
+  document.getElementById('scoreNum').textContent = pct + '%';
+  document.getElementById('scoreDetail').textContent = أجبت بدقة على ${correct} سؤالًا من أصل ${total} (أجبت عن ${attempted}).;
+  const msg = document.getElementById('scoreMsg');
+  if(pct >= 90) msg.textContent = '🌟 ممتاز! جاهز تمامًا للامتحان';
+  else if(pct >= 75) msg.textContent = '👏 جيد جدًا! راجع الأخطاء البسيطة';
+  else if(pct >= 50) msg.textContent = '📚 مقبول — أعد مراجعة الملخص النهائي';
+  else msg.textContent = '💪 تحتاج مراجعة أخرى — ابدأ من الخط الزمني والبطاقات';
+  const circle = document.getElementById('scoreCircle');
+  circle.style.background = conic-gradient(var(--purple) ${pct*3.6}deg, var(--lav-light) ${pct*3.6}deg);
+  res.scrollIntoView({behavior:'smooth'});
+  localStorage.setItem('tqmQuizBest', Math.max(pct, +(localStorage.getItem('tqmQuizBest')||0)));
+}
+function resetQuiz(){
+  answeredMcq = new Array(MCQ.length).fill(null);
+  answeredTf = new Array(TF.length).fill(null);
+  buildQuiz();
+  document.getElementById('quizResult').classList.remove('show');
+  window.scrollTo({top:document.getElementById('quiz').offsetTop,behavior:'smooth'});
+}
+function switchQuiz(type){
+  document.getElementById('mcqArea').style.display = type==='mcq' ? 'block':'none';
+  document.getElementById('tfArea').style.display = type==='tf' ? 'block':'none';
+  document.getElementById('tabMcq').classList.toggle('active', type==='mcq');
+  document.getElementById('tabTf').classList.toggle('active', type==='tf');
+}
+
+/* ================== بطاقات الحفظ ================== */
+document.querySelectorAll('.flash').forEach(f=>f.addEventListener('click',()=>f.classList.toggle('flipped')));
+
+/* ================== أسئلة الملخص ================== */
+document.querySelectorAll('.qa-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item = q.parentElement;
+    const ans = item.querySelector('.qa-a');
+    const open = item.classList.toggle('open');
+    ans.style.maxHeight = open ? ans.scrollHeight + 'px' : '0';
+  });
+});
+
+/* ================== تتبع التقدم ================== */
+const SECS = ['timeline','stages','scientists','theories','compare','summary','flash'];
+function updateProgress(){
+  const done = SECS.filter(s=>localStorage.getItem('tqmStudied_'+s)==='1').length;
+  const pct = Math.round(done/SECS.length*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '%';
+}
+document.querySelectorAll('.study-done').forEach(cb=>{
+  cb.checked = localStorage.getItem('tqmStudied_'+cb.dataset.sec)==='1';
+  cb.addEventListener('change',()=>{
+    localStorage.setItem('tqmStudied_'+cb.dataset.sec, cb.checked?'1':'0');
+    updateProgress();
+  });
+});
+updateProgress();
+
+/* ================== تمييز الرابط النشط ================== */
+const sections = document.querySelectorAll('section[id], header[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll',()=>{
+  let current = 'home';
+  sections.forEach(s=>{ if(window.scrollY >= s.offsetTop - 120) current = s.id; });
+  navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+current));
+});
+</script>
+</body>
+</html>
